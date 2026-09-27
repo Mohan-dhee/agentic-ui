@@ -1,0 +1,23 @@
+{
+  "extends": ["stylelint-config-recommended"],
+  "ignoreFiles": [".next/**", "out/**", "storybook-static/**"],
+  "rules": {
+    "selector-pseudo-class-no-unknown": [true, { "ignorePseudoClasses": ["global", "local"] }],
+    "property-no-unknown": [true, { "ignoreProperties": ["composes"] }],
+    "no-descending-specificity": null
+  },
+  "overrides": [
+    {
+      "files": ["app/globals.css"],
+      "rules": {
+        "no-duplicate-selectors": null
+      }
+    },
+    {
+      "files": ["app/components/**/*.module.css"],
+      "rules": {
+        "color-no-hex": [true, { "severity": "warning", "message": "Hard rule 4: resolve colors to a token (var(--…)), never a hex value." }]
+      }
+    }
+  ]
+}
