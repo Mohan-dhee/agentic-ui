@@ -1,56 +1,8 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
-import { JetBrains_Mono } from "next/font/google";
-import localFont from "next/font/local";
 import "./globals.css";
 import { SubNav } from "./components/SubNav";
+import { fontVariables } from "./fonts";
 import styles from "./layout.module.css";
-
-const geist = Geist({
-  variable: "--font-geist",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const newYorkLarge = localFont({
-  src: [
-    {
-      path: "./fonts/NewYorkLarge-Regular.otf",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "./fonts/NewYorkLarge-Medium.otf",
-      weight: "500",
-      style: "normal",
-    },
-    {
-      path: "./fonts/NewYorkLarge-Bold.otf",
-      weight: "700",
-      style: "normal",
-    },
-  ],
-  variable: "--font-new-york-large",
-  display: "swap",
-});
-
-const departureMono = localFont({
-  src: [
-    {
-      path: "./fonts/DepartureMono-Regular.otf",
-      weight: "400",
-      style: "normal",
-    },
-  ],
-  variable: "--font-departure-mono",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Agentic Design System",
@@ -63,10 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geist.variable} ${jetbrainsMono.variable} ${newYorkLarge.variable} ${departureMono.variable}`}
-    >
+    <html lang="en" className={fontVariables}>
       <body>
         <SubNav />
         <div className={styles.content}>{children}</div>
