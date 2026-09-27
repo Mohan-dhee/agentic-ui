@@ -106,10 +106,11 @@ export const Button = forwardRef<
   return (
     <button
       ref={ref as React.Ref<HTMLButtonElement>}
+      {...buttonRest}
       type={buttonRest.type ?? 'button'}
       className={classNames}
+      // After the spread so an explicit disabled={false} can't re-enable a loading button
       disabled={loading || (buttonRest.disabled ?? false)}
-      {...buttonRest}
     >
       {spinnerEl}
       {children}

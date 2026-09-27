@@ -20,6 +20,12 @@ describe('Button', () => {
     expect(screen.getByRole('button', { name: 'Send' })).toBeDisabled();
   });
 
+  it('stays disabled while loading even when disabled={false} is passed', () => {
+    render(<Button loading disabled={false}>Send</Button>);
+
+    expect(screen.getByRole('button', { name: 'Send' })).toBeDisabled();
+  });
+
   it('renders a link when href is set', () => {
     render(<Button href="/docs">Docs</Button>);
 
