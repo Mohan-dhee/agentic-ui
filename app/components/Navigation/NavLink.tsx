@@ -1,3 +1,5 @@
+'use client';
+
 import { Icon } from '../Icon/Icon';
 import styles from './Navigation.module.css';
 

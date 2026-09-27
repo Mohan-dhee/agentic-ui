@@ -68,7 +68,8 @@ echo ""
 
 for tsxfile in $(grep -rl "cursor:\s*pointer\|cursor: pointer" app/components/**/*.module.css 2>/dev/null | sed 's/\.module\.css//' | while read base; do
   dir=$(dirname "$base")
-  find "$dir" -name "*.tsx" -maxdepth 1
+  # Skip tests and stories: the pipeline generates them next to every component
+  find "$dir" -maxdepth 1 -name "*.tsx" ! -name "*.test.tsx" ! -name "*.stories.tsx"
 done | sort -u); do
   component=$(basename "$tsxfile")
   echo "Checking: $tsxfile"

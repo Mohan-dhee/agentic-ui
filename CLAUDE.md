@@ -50,13 +50,14 @@ Quick reference of hard constraints (details and rationale in the full doc):
 
 | Layer | Technology |
 |---|---|
-| Framework | React 18+ with `React.forwardRef` |
+| Framework | Next.js 16 (App Router) + React 19, components use `React.forwardRef` |
+| Components | `app/components/[ComponentName]/`, import via `@/app/components/…` (`@/src/…` for `src/lib`) |
 | Language | TypeScript strict (`"strict": true`) |
 | Styling | CSS Modules + CSS Custom Properties (3-tier tokens) |
 | Icons | Figma export → SVGR React components |
 | Animation | `motion/react` (Framer Motion v11+) |
-| Stories | Storybook 8+ with `tags: ['autodocs']` |
-| Tests | Vitest + jest-axe |
+| Stories | Storybook 10 (`@storybook/nextjs-vite`) with `tags: ['autodocs']` |
+| Tests | Vitest + Testing Library + jest-axe (`[Name].test.tsx` beside the component) |
 | No | Tailwind, styled-components, CSS-in-JS runtime, external UI libs |
 
 ---
@@ -72,8 +73,11 @@ Quick reference of hard constraints (details and rationale in the full doc):
 | `.ai/refactoring.md` | Before Step 6 (Refactor) | 6 refactoring passes with binary pass/fail checklists, skip conditions |
 | `.ai/quality-gates.md` | Before Step 7 (QC) | QC levels 0–5, verification commands, three-tier boundary system |
 | `.ai/motion-rules.md` | Any animation work or `animate` command | **Definitive motion bible.** Easing/duration tokens, CSS transition rules, motion/react patterns, drag/snap/text feedback, overflow/clipping, anti-patterns, component checklist. |
-| `.ai/component-registry.md` | Before generating or auditing any component | Living component index, icon inventory, status definitions |
-| `.ai/diagnostics.md` | When any pipeline step fails | Figma MCP failures, CSS token bugs, SVG rendering bugs, Storybook build errors |
+| `.ai/motion-presets.md` | When using the `src/lib` presets or `useContextAnimation` | Component × trigger → preset lookup, context overrides, code patterns |
+| `.ai/code-quality-rules.md` | Before Step 8 (Refactor) and before committing | AI-specific anti-patterns, React quality rules, pre-commit checklist |
+| `.ai/icon-extraction-rules.md` | Any icon extraction | Reading MCP insets, icon sizing and export rules |
+| `.ai/component-registry.md` | Before generating or auditing any component | Living component index, status definitions, known issues |
+| `.ai/diagnostics.md` | When any pipeline step fails | Figma MCP failures, build/type errors, CSS token bugs, test and Storybook errors |
 
 **Load on demand only. Do not preload all files.**
 
@@ -196,22 +200,22 @@ For implementation work:
 ## Workflow
 
 1. **Extract** — Read `.ai/extraction.md`. Use Figma MCP to pull component tree, tokens, SVG inventory, variant matrix. Save to `.ai/specs/`.
-2. **Extract States** — For every interactive element found in step 1, call `get_design_context` on the **base component node ID** (listed in "Component descriptions" from MCP response). Parse the full variant matrix. List every state (default, hover, active, focus, disabled, loading) and record the exact token/value changes per state. Do NOT proceed until this list is complete.
+2. **Extract States** — For every interactive element found in step 1, call `get_design_context` (or its equivalent, see `.ai/extraction.md`) on the **base component node ID** (listed in "Component descriptions" from MCP response). Parse the full variant matrix. List every state (default, hover, active, focus, disabled, loading) and record the exact token/value changes per state. Do NOT proceed until this list is complete.
 3. **Validate (QC-0)** — Run QC-0 checks from `.ai/quality-gates.md`. Zero hardcoded values, all SVGs inventoried, variant matrix complete, **state matrix complete for every interactive element**. Fail → re-extract.
 4. **Generate** — Read `.ai/generation.md`. Write `.tsx`, `.module.css`, `.types.ts`, `.tokens.css`, `.stories.tsx`, `.test.tsx`, `icons/`, `index.ts`, `README.md`. Update `.ai/component-registry.md`.
    - Every interactive component MUST be `'use client'` with state management.
    - Every CSS module MUST include `:hover`, `:focus-visible` rules for interactive selectors.
    - Every component MUST have click/change handlers that produce real state transitions.
-5. **State Audit Gate** — Run `bash scripts/audit-interactive-states.sh`. This script checks that every CSS module with `cursor: pointer` has `:hover` and `:focus-visible` rules, and that every component with event handlers has `'use client'`. **Zero failures required to proceed.** Fix any failures before continuing.
+5. **State Audit Gate** — Run `npm run audit:states` (`scripts/audit-interactive-states.sh`). This script checks that every CSS module with `cursor: pointer` has `:hover` and `:focus-visible` rules, and that every component with event handlers has `'use client'`. **Zero failures required to proceed.** Fix any failures before continuing.
 6. **Showcase** *(SHOWCASE/FULL only)* — Generate `showcase/[ComponentName]/index.html` with variant gallery, state matrix, dark mode, token table.
 7. **Visual Check Pause** — STOP. Present for visual review. Do NOT proceed until user approves.
 8. **Refactor** — Read `.ai/refactoring.md`. Run 6 passes. One commit per pass. Never combine. If a step fails, consult `.ai/diagnostics.md`.
-9. **Final QC** — Read `.ai/quality-gates.md`. Run `tsc --noEmit && eslint . && stylelint "**/*.css" && vitest run && bash scripts/audit-interactive-states.sh`. Zero failures = ship.
+9. **Final QC** — Read `.ai/quality-gates.md`. Run `npm run qc` (typecheck → eslint → stylelint → vitest → states audit). Zero failures = ship. Also run `npm run build` if the change touches app routes or shared config.
 
 ---
 
 ## Storybook MCP Integration
 
-Before generating stories or new components, check if Storybook's MCP server is running at `http://localhost:6006/mcp`.
+Before generating stories or new components, check if Storybook's MCP server (`@storybook/addon-mcp`) is running at `http://localhost:6006/mcp`. If not, ask the user to start it with `npm run storybook`.
 If available: query the component manifest to read existing props, variants, and story patterns before writing.
 All stories must include `tags: ['autodocs']` and JSDoc on every prop for manifest extraction.

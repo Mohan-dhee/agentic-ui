@@ -2,9 +2,15 @@
 // Composable animation hooks for the design system.
 // These abstract Framer Motion API complexity behind intent-driven interfaces.
 
-import { useReducedMotion } from "motion/react";
+import { useReducedMotion, type Variants } from "motion/react";
 import { motionPresets, type MotionPresetKey } from "./motionPresets";
 import { contextAnimationMap, type AnimationContext } from "./contextAnimationMap";
+
+// Presets have different variant keys (hidden/visible, rest/hovered, …), so
+// widen to Variants before looking up a key that only some presets define.
+function variantsOf(key: MotionPresetKey): Variants {
+  return motionPresets[key].variants;
+}
 
 // ─── useMotionPreset ───────────────────────────────────────────────────────
 // Returns the full Framer Motion props for a given preset key.
@@ -61,21 +67,20 @@ export function useContextAnimation(context: AnimationContext) {
   }
 
   if (config.unmount) {
-    const exitPreset = motionPresets[config.unmount];
-    itemProps.exit = exitPreset.variants.hidden ?? { opacity: 0 };
+    const exitVariants = variantsOf(config.unmount);
+    itemProps.exit = exitVariants.hidden ?? { opacity: 0 };
   }
 
   if (config.hover) {
-    const hoverPreset = motionPresets[config.hover];
-    const hoverVariant = hoverPreset.variants.hovered ?? hoverPreset.variants.selected;
+    const hoverVariants = variantsOf(config.hover);
+    const hoverVariant = hoverVariants.hovered ?? hoverVariants.selected;
     if (hoverVariant) {
       itemProps.whileHover = hoverVariant;
     }
   }
 
   if (config.tap) {
-    const tapPreset = motionPresets[config.tap];
-    const tapVariant = tapPreset.variants.pressed;
+    const tapVariant = variantsOf(config.tap).pressed;
     if (tapVariant) {
       itemProps.whileTap = tapVariant;
     }

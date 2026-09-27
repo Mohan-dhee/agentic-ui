@@ -5,7 +5,7 @@
 Every component follows this structure exactly:
 
 ```
-src/components/[ComponentName]/
+app/components/[ComponentName]/
   [ComponentName].tsx          ← Main component
   [ComponentName].module.css   ← Scoped styles (CSS Modules)
   [ComponentName].types.ts     ← Props interface + variant types

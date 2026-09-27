@@ -4,6 +4,25 @@
 
 Before generating anything, read the Figma source. Use the Figma MCP connection to extract structured data from the linked frame.
 
+### Which MCP server
+
+These docs were written against the **official Figma MCP server** (Dev Mode MCP / the Figma plugin for Claude Code). Its `get_design_context` output is what the inset-based icon rules in `svg-pipeline.md` and `icon-extraction-rules.md` describe, so prefer it.
+
+[figma-console-mcp](https://github.com/southleft/figma-console-mcp) also works. Its tools are named differently:
+
+| Need | Official Figma MCP | figma-console-mcp |
+|---|---|---|
+| Layer tree, layout, styles for a node | `get_design_context` | `figma_get_component_for_development` |
+| Variables / tokens | `get_variable_defs` | `figma_get_variables` |
+| Tokens + components + styles in one call | — | `figma_get_design_system_kit` |
+| Rendered image | `get_screenshot` | `figma_get_component_image` |
+| Node structure only | `get_metadata` | `figma_get_file_data` |
+| Designer annotations | — | `figma_get_annotations` |
+
+With figma-console-mcp, icon insets are not pre-computed: derive them from the inner "icon" layer's bounds relative to the icon frame.
+
+Wherever a doc says `get_design_context`, use the equivalent row above.
+
 ### Extraction Prompt
 
 ```
@@ -101,4 +120,4 @@ Before writing any code, confirm every item passes:
 - If nested components exist, explicitly request: "Also fetch the Icon and Button components nested here"
 - Named layers in Figma improve extraction accuracy by ~30%
 - Figma variables (design tokens) extract perfectly; hardcoded values force guessing
-- If MCP fails: restart Figma, re-select the frame, retry. Don't debug for more than 2 minutes.
+- If MCP fails: restart Figma, re-select the frame, retry. Don't debug for more than 2 minutes; check `.ai/diagnostics.md`, then report the error.

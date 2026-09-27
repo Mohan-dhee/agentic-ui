@@ -68,8 +68,9 @@ You are a **senior design engineer** on a design system team. You think in token
 
 ## Environment
 
-- **AI tool**: Claude Code inside Cursor
-- **Stack**: React 18+ / TypeScript strict / CSS Modules / Storybook
+- **AI tool**: Claude Code (CLI, desktop app, or IDE extension)
+- **Stack**: Next.js 16 / React 19 / TypeScript strict / CSS Modules / Storybook 10
+- **Components**: `app/components/[ComponentName]/`
 - **Tokens**: CSS Custom Properties, 3-tier (primitive → semantic → component)
 - **Icons**: Figma export → SVGR React components
 - **No external UI libraries** — fully custom design system
@@ -79,7 +80,7 @@ You are a **senior design engineer** on a design system team. You think in token
 
 When the user provides a Figma link, execute the steps for the detected mode. Read the relevant reference file before each phase.
 
-### Step 1 — Extract (read `references/extraction.md`)
+### Step 1 — Extract (read `.ai/extraction.md`)
 
 Use Figma MCP to read the linked frame. Extract:
 - Component tree (layers, dimensions, positions)
@@ -104,9 +105,9 @@ Before writing ANY code, confirm:
 
 **Fail → re-extract. Do not proceed.**
 
-### Step 3 — Generate (read `references/generation.md`)
+### Step 3 — Generate (read `.ai/generation.md`)
 
-Following the spec, generate into `src/components/[ComponentName]/`:
+Following the spec, generate into `app/components/[ComponentName]/`:
 
 ```
 [ComponentName].tsx          — React.forwardRef, TypeScript strict
@@ -115,7 +116,7 @@ Following the spec, generate into `src/components/[ComponentName]/`:
 [ComponentName].tokens.css   — Component-level CSS custom property aliases
 [ComponentName].stories.tsx  — Storybook stories for all variants
 [ComponentName].test.tsx     — Behavior + accessibility tests
-icons/*.tsx                  — SVGR components (read references/svg-pipeline.md)
+icons/*.tsx                  — SVGR components (read `.ai/svg-pipeline.md`)
 index.ts                     — Barrel export (named exports)
 README.md                    — Usage docs, props table, do/don't, token map
 ```
@@ -138,7 +139,7 @@ Create `showcase/[ComponentName]/index.html` — a standalone HTML page with:
 
 Show: Storybook or showcase page. The user will compare to Figma and give redline feedback (e.g., "padding-left is 16px, should be 12px"). Apply fixes. **Do NOT proceed to refactoring until the user approves.**
 
-### Step 6 — Refactoring Passes (read `references/refactoring.md`)
+### Step 6 — Refactoring Passes (read `.ai/refactoring.md`)
 
 After user approval, run 6 atomic passes. **One commit per pass. Never combine.**
 
@@ -151,15 +152,15 @@ After user approval, run 6 atomic passes. **One commit per pass. Never combine.*
 | 5 | Documentation & Storybook | `docs: component documentation` |
 | 6 | Dead Code & Cleanup | `chore: cleanup` |
 
-### Step 7 — Final QC (read `references/quality-gates.md`)
+### Step 7 — Final QC (read `.ai/quality-gates.md`)
 
-Run all automated checks:
+Run all automated checks with `npm run qc`, which chains:
 ```
-tsc --noEmit          → zero errors
-eslint .              → zero warnings/errors
-stylelint .           → passes
-vitest run            → all tests pass
-jest-axe              → zero a11y violations
+npm run typecheck     → tsc --noEmit, zero errors
+npm run lint          → eslint, zero errors
+npm run lint:css      → stylelint, zero errors
+npm test              → vitest run, all tests pass (jest-axe: zero a11y violations)
+npm run audit:states  → interactive-states audit, zero failures
 ```
 
 Report results. **Zero failures = ship it.**
@@ -179,7 +180,7 @@ Every level is blocking. A component cannot advance until the current level pass
 
 ## First-Time Setup
 
-If the `.ai/` directory does not exist in the user's project, create it using the templates in `assets/ai-directory/`. This gives the AI persistent context across sessions:
+This repo already ships the `.ai/` directory. To reuse the pipeline in another project, copy `.ai/` and `CLAUDE.md` across and adapt the `ag-` prefix and token structure to match that system. `specs/` and `tokens/` are created on the first extraction:
 
 ```
 .ai/
@@ -188,17 +189,16 @@ If the `.ai/` directory does not exist in the user's project, create it using th
 ├── svg-pipeline.md               — Icon export and conversion rules
 ├── quality-gates.md              — QC levels and refactoring pass order
 ├── component-token-map.md        — Template for per-component token tables
+├── component-registry.md         — Index of implemented components
 ├── icon-inventory.md             — Running inventory of all SVG icons
 ├── specs/                        — Figma extraction JSONs (per component)
 └── tokens/                       — Token resolution tables (per component)
 ```
 
-Read the assets files and write them into the user's `.ai/` directory, adapting the `ag-` prefix and token structure to match whatever the user's system already uses.
-
 ## Reference Files
 
-- `references/extraction.md` — Detailed Figma MCP extraction protocol, token resolution table format, pre-generation checklist
-- `references/generation.md` — Component generation rules (structure, props, styling, pixel fidelity, composition, a11y), showcase page spec
-- `references/svg-pipeline.md` — SVG export, SVGR conversion, color handling, logo vs icon distinction, inventory format
-- `references/refactoring.md` — All 6 refactoring passes with complete checklists
-- `references/quality-gates.md` — QC levels 0-5 with full checklists and pass/fail criteria
+- `.ai/extraction.md` — Detailed Figma MCP extraction protocol, token resolution table format, pre-generation checklist
+- `.ai/generation.md` — Component generation rules (structure, props, styling, pixel fidelity, composition, a11y), showcase page spec
+- `.ai/svg-pipeline.md` — SVG export, SVGR conversion, color handling, logo vs icon distinction, inventory format
+- `.ai/refactoring.md` — All 6 refactoring passes with complete checklists
+- `.ai/quality-gates.md` — QC levels 0-5 with full checklists and pass/fail criteria

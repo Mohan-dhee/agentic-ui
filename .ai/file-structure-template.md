@@ -3,7 +3,7 @@
 ## Component
 
 ```
-src/components/[ComponentName]/
+app/components/[ComponentName]/
 ├── [ComponentName].tsx          # Component implementation
 ├── [ComponentName].module.css   # Scoped CSS Modules styles
 ├── [ComponentName].types.ts     # TypeScript interfaces & types

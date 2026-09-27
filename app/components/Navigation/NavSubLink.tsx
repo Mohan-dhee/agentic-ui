@@ -1,3 +1,5 @@
+'use client';
+
 import styles from './Navigation.module.css';
 
 interface NavSubLinkProps {
