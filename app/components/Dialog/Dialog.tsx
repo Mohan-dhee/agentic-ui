@@ -26,7 +26,7 @@ export function Dialog({
   children,
   className,
 }: DialogProps) {
-  const trap = useFocusTrap({
+  const { ref: trapRef, activate, deactivate } = useFocusTrap({
     onEscape: onClose,
     autoFocus: true,
     returnFocus: true,
@@ -41,14 +41,14 @@ export function Dialog({
       document.body.style.overflow = 'hidden';
       // Small delay to ensure the DOM has rendered before activating
       const raf = requestAnimationFrame(() => {
-        trap.activate();
+        activate();
       });
       return () => cancelAnimationFrame(raf);
     } else {
-      trap.deactivate();
+      deactivate();
       document.body.style.overflow = savedOverflowRef.current;
     }
-  }, [open, trap]);
+  }, [open, activate, deactivate]);
 
   // Cleanup on unmount — restore overflow
   useEffect(() => {
@@ -76,7 +76,7 @@ export function Dialog({
           onClick={handleBackdropClick}
         >
           <motion.div
-            ref={trap.ref}
+            ref={trapRef}
             role="dialog"
             aria-modal="true"
             className={[styles.panel, styles[size], className]

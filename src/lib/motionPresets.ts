@@ -3,7 +3,7 @@
 // Claude imports from this file exclusively — hardcoded values are never acceptable.
 
 import type { Variants, Transition } from "motion/react";
-import { semanticMotion, motionEasing } from "@/tokens/motion";
+import { semanticMotion } from "@/src/tokens/motion";
 
 export interface MotionPreset {
   variants: Variants;

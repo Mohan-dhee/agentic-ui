@@ -3,7 +3,7 @@
 // Traps Tab key within a container, handles Escape, returns focus on deactivate.
 // No external dependencies.
 
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect, useMemo } from "react";
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -30,8 +30,8 @@ interface FocusTrapAPI {
   activate: () => void;
   /** Deactivate the focus trap. */
   deactivate: () => void;
-  /** Whether the trap is currently active. */
-  isActive: boolean;
+  /** Whether the trap is currently active. Call outside render (handlers, effects). */
+  isActive: () => boolean;
 }
 
 export function useFocusTrap(options: UseFocusTrapOptions = {}): FocusTrapAPI {
@@ -43,7 +43,9 @@ export function useFocusTrap(options: UseFocusTrapOptions = {}): FocusTrapAPI {
 
   // Store latest onEscape in a ref to avoid re-binding listeners
   const onEscapeRef = useRef(onEscape);
-  onEscapeRef.current = onEscape;
+  useEffect(() => {
+    onEscapeRef.current = onEscape;
+  }, [onEscape]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!activeRef.current || !containerRef.current) return;
@@ -135,10 +137,12 @@ export function useFocusTrap(options: UseFocusTrapOptions = {}): FocusTrapAPI {
     containerRef.current = node;
   }, []);
 
-  return {
-    ref,
-    activate,
-    deactivate,
-    get isActive() { return activeRef.current; },
-  };
+  const isActive = useCallback(() => activeRef.current, []);
+
+  // Stable identity so consumers can list the API in effect dependencies
+  // without re-running the effect on every render.
+  return useMemo(
+    () => ({ ref, activate, deactivate, isActive }),
+    [ref, activate, deactivate, isActive],
+  );
 }
