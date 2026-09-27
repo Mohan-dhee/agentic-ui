@@ -1,3 +1,5 @@
+'use client';
+
 import { type ReactNode, forwardRef } from 'react';
 import { Icon } from '../Icon/Icon';
 import styles from './Menu.module.css';
