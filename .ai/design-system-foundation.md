@@ -26,7 +26,7 @@ Examples:
 - camelCase for props: `variant`, `size`, `isDisabled`, `showIcon`
 
 ## File Structure
-Every component lives in `src/components/[ComponentName]/` with:
+Every component lives in `app/components/[ComponentName]/` with:
 - `[ComponentName].tsx`
 - `[ComponentName].module.css`
 - `[ComponentName].types.ts`

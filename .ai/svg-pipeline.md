@@ -165,7 +165,7 @@ This only produces correct results when the SVG `viewBox` matches the frame size
 ## Logo vs Icon Distinction
 
 **Icons:**
-- Live in `src/components/[ComponentName]/icons/`
+- Live in `app/components/[ComponentName]/icons/`
 - Use `currentColor` for color inheritance
 - Decorative by default (`aria-hidden="true"`)
 - Named exports for tree-shaking

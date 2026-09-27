@@ -10,7 +10,7 @@ When the user types `/refactor [ComponentName]`, execute the full quality refact
 
 ## Setup
 
-1. Locate the component at `src/components/[ComponentName]/`
+1. Locate the component at `app/components/[ComponentName]/`
 2. Read `.ai/refactoring.md` for the 6-pass checklist
 3. Read `.ai/code-quality-rules.md` for anti-pattern detection and architecture rules
 

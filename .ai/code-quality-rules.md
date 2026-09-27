@@ -1,6 +1,6 @@
 # Ready to Work — React Code Quality Rules for AI-Generated Design System Components
 
-> Drop this into `.ai/ready-to-work.md`. Claude reads it after generating any component and before committing.
+> Lives at `.ai/code-quality-rules.md`. Claude reads it after generating any component and before committing.
 > These rules exist because LLMs produce specific, predictable failure patterns. Every rule below addresses a real anti-pattern observed in AI-generated React code from Cursor, Claude Code, and Copilot.
 
 ---
@@ -430,7 +430,7 @@ const handleSelect = useCallback((id: string) => onSelect(id), [onSelect]);
 
 ### Bundle Rules
 - Every SVG icon: named export (tree-shakeable)
-- No barrel re-exports from `src/components/index.ts` that pull the entire library
+- No barrel re-exports from `app/components/index.ts` that pull the entire library
 - Component-level code splitting for route-specific components via `React.lazy`
 - Target: each component < 10KB gzipped (excluding shared tokens)
 
@@ -439,19 +439,20 @@ const handleSelect = useCallback((id: string) => onSelect(id), [onSelect]);
 ## 10. PRE-COMMIT CHECKLIST (run before every commit)
 
 ```bash
-# Automated (must pass)
-tsc --noEmit                    # Zero type errors
-eslint . --ext .ts,.tsx         # Zero warnings, zero errors
-stylelint "**/*.css"            # CSS quality
-vitest run                      # All tests pass
+# Automated (must pass) — npm run qc runs all five in order
+npm run typecheck               # tsc --noEmit: zero type errors
+npm run lint                    # ESLint 9 flat config: zero errors
+npm run lint:css                # stylelint "**/*.css": zero errors
+npm test                        # vitest run: all tests pass, incl. jest-axe
+npm run audit:states            # scripts/audit-interactive-states.sh
 
 # Manual review
-grep -rn "any" src/             # Should return zero results in component code
-grep -rn "as " src/             # Flag type assertions — each needs justification
-grep -rn "console\." src/       # Should return zero (unless error boundary)
-grep -rn "!important" src/      # Must be zero
-grep -rn "style={{" src/        # Should be zero or justified
-grep -rn "#[0-9a-fA-F]" src/   # Hardcoded hex — must be zero in .tsx, .css
+grep -rn "any" app/components/             # Should return zero results in component code
+grep -rn "as " app/components/             # Flag type assertions — each needs justification
+grep -rn "console\." app/components/       # Should return zero (unless error boundary)
+grep -rn "!important" app/components/      # Must be zero
+grep -rn "style={{" app/components/        # Should be zero or justified
+grep -rn "#[0-9a-fA-F]" app/components/   # Hardcoded hex — must be zero in .tsx, .css
 ```
 
 ---
